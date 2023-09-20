@@ -91,10 +91,14 @@ for i in range(1, len(data)):  # Start from 1 to skip the header
     index_terms.update(words)
 
 print('Index terms:', index_terms)
+counter = 1
 with open('collection.csv', 'r') as csvfile:
   reader = csv.reader(csvfile)
   for i, row in enumerate(reader):
-      print(row[0].split())
+      if i==0:
+          continue
+      print('Tokenized d'+ str(counter), ": ", row[0].split())
+      counter += 1
 
 #Build the tf-idf term weights matrix.
 #--> add your Python code here
@@ -158,10 +162,11 @@ d3dogtfidf = d3dogtf*d1dogidf
 
 
 #Results
+print("\nBelow is the tf-idf term weights matrix:")
 print("       love             cat                  dog")
 print("doc1   ",float(d1lovetfidf),"   ",float(d1cattfidf),"        ",float(d1dogtfidf))
 print("doc2   ",float(d2lovetfidf),"            ",float(d2cattfidf),"          ",float(d2dogtfidf))
-print("doc3   ",float(d3lovetfidf),"   ",float(d3cattfidf),"  ",float(d3dogtfidf))
+print("doc3   ",float(d3lovetfidf),"   ",float(d3cattfidf),"  ",float(d3dogtfidf), "\n")
 
 
 
@@ -169,6 +174,47 @@ print("doc3   ",float(d3lovetfidf),"   ",float(d3cattfidf),"  ",float(d3dogtfidf
 #Calculate the document scores (ranking) using document weigths (tf-idf) calculated before and query weights (binary - have or not the term).
 #--> add your Python code here
 docScores = []
-
+userquery = input('Please enter a query')
+print('The user query is \"' + userquery + '\"')
+userquery = ' '.join(word for word in userquery.split() if word not in stopWords)
+userquery = ' '.join(steeming.get(word, word) for word in userquery.split())
+splituserquery = userquery.split()
+for i in splituserquery:
+    if i in stopWords:
+        userquery.replace(i, '')
+print("Tokenized query is ", userquery.split())
+print("The binary query is \n")
+doc1score = d1lovetfidf+d1cattfidf+d1dogtfidf
+doc2score = d2lovetfidf+d2cattfidf+d2dogtfidf
+doc3score = d3lovetfidf+d3cattfidf+d3dogtfidf
+print("Document 1 score is ", doc1score)
+print("Document 2 score is ", doc2score)
+print("Document 3 score is ", doc3score, "\n")
+retrievedDocs = []
+relevantDocs = []
+hitDocs = []
+missedDocs = []
+noise = []
+docscoreList = [doc1score, doc2score, doc3score]
+maxdocscoreList = max(docscoreList)
+if maxdocscoreList == doc1score:
+    retrievedDocs.append(1)
+    relevantDocs.append(1)
+    hitDocs.append(1)
+if maxdocscoreList == doc2score:
+    retrievedDocs.append(2)
+    relevantDocs.append(2)
+    hitDocs.append(2)
+if maxdocscoreList == doc3score:
+    retrievedDocs.append(3)
+    relevantDocs.append(3)
+    hitDocs.append(3)
+print("Retrieved documents: " + str(retrievedDocs))
+print("Relevant documents: " + str(relevantDocs))
+print("Hit documents: " + str(hitDocs))
+print("Missed documents: ")
+print("Noise" )
 #Calculate and print the precision and recall of the model by considering that the search engine will return all documents with scores >= 0.1.
 #--> add your Python code here
+precision
+recall
