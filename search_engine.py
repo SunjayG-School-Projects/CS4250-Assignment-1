@@ -1,9 +1,10 @@
 #-------------------------------------------------------------------------
-# AUTHOR: your name
-# FILENAME: title of the source file
-# SPECIFICATION: description of the program
+# AUTHOR: Sunjay Guttikonda
+# FILENAME: search_engine.py
+# SPECIFICATION: Analyze three documents and perform various
+# information retrieval tasks and present the results in an organized format
 # FOR: CS 4250- Assignment #1
-# TIME SPENT: how long it took you to complete the assignment
+# TIME SPENT: 3.5 hours
 #-----------------------------------------------------------*/
 
 #IMPORTANT NOTE: DO NOT USE ANY ADVANCED PYTHON LIBRARY TO COMPLETE THIS CODE SUCH AS numpy OR pandas. You have to work here only with standard arrays
@@ -27,6 +28,7 @@ with open('collection.csv', 'r') as csvfile:
 
 stopWords = {'I', 'and', 'She', 'They', 'her', 'their'}
 #Conduct stopword removal.
+#--> add your Python code here
 """counter = [0,1,2,3,4]
 with open('collection.csv', 'r') as csvfile:
       reader = csv.reader(csvfile)
@@ -60,7 +62,6 @@ with open('collection.csv', 'w', newline='') as csvfile:
     for i, row in enumerate(reader):
         print(row)
 """
-#--> add your Python code here
 
 
 #Conduct stemming.
@@ -174,7 +175,7 @@ print("doc3   ",float(d3lovetfidf),"   ",float(d3cattfidf),"  ",float(d3dogtfidf
 #Calculate the document scores (ranking) using document weigths (tf-idf) calculated before and query weights (binary - have or not the term).
 #--> add your Python code here
 docScores = []
-userquery = input('Please enter a query')
+userquery = 'cat and dogs'
 print('The user query is \"' + userquery + '\"')
 userquery = ' '.join(word for word in userquery.split() if word not in stopWords)
 userquery = ' '.join(steeming.get(word, word) for word in userquery.split())
@@ -182,8 +183,17 @@ splituserquery = userquery.split()
 for i in splituserquery:
     if i in stopWords:
         userquery.replace(i, '')
+userqueryArray = userquery.split()
+binaryQuery = []
+tokenizedD3 = ['love', 'dog', 'cat']
+for k in tokenizedD3:
+    if k == userqueryArray[0] or k == userqueryArray[1]:
+        binaryQuery.append(1)
+    else:
+        binaryQuery.append(0)
+
 print("Tokenized query is ", userquery.split())
-print("The binary query is \n")
+print("The binary query is", binaryQuery, "\n")
 doc1score = d1lovetfidf+d1cattfidf+d1dogtfidf
 doc2score = d2lovetfidf+d2cattfidf+d2dogtfidf
 doc3score = d3lovetfidf+d3cattfidf+d3dogtfidf
@@ -197,24 +207,48 @@ missedDocs = []
 noise = []
 docscoreList = [doc1score, doc2score, doc3score]
 maxdocscoreList = max(docscoreList)
-if maxdocscoreList == doc1score:
+if doc1score > 0.1:
     retrievedDocs.append(1)
-    relevantDocs.append(1)
-    hitDocs.append(1)
-if maxdocscoreList == doc2score:
+if doc2score > 0.1:
     retrievedDocs.append(2)
-    relevantDocs.append(2)
-    hitDocs.append(2)
-if maxdocscoreList == doc3score:
+if doc3score > 0.1:
     retrievedDocs.append(3)
-    relevantDocs.append(3)
-    hitDocs.append(3)
+relevantCounter = -1
+with open('collection.csv', 'r') as csvfile:
+  reader = csv.reader(csvfile)
+  for i, row in enumerate(reader):
+      relevantCounter += 1
+      if str(row[1]) == ' R':
+          relevantDocs.append(relevantCounter)
+      #print(row[1])
+retrievedTotal = 0
+relevantTotal = 0
+for i in range(0, len(retrievedDocs)):
+    #retrievedTotal += retrievedDocs[i]
+    #relevantTotal += relevantDocs[i]
+    hitDocs.append(int((retrievedDocs[i]+relevantDocs[i])/2))
+
+with open('collection.csv', 'r') as csvfile:
+  reader = csv.reader(csvfile)
+  for i, row in enumerate(reader):
+      if str(row[0]) == 'Document' or 'love cat cat' or 'love dog' or 'love dog cat':
+          continue
+
+with open('collection.csv', 'r') as csvfile:
+  reader = csv.reader(csvfile)
+  for i, row in enumerate(reader):
+      if str(row[1]) == ' R' or ' I' or ' Label':
+          continue
+
 print("Retrieved documents: " + str(retrievedDocs))
 print("Relevant documents: " + str(relevantDocs))
 print("Hit documents: " + str(hitDocs))
-print("Missed documents: ")
-print("Noise" )
+print("Missed documents: ", missedDocs)
+print("Noise: ", noise, "\n")
+
 #Calculate and print the precision and recall of the model by considering that the search engine will return all documents with scores >= 0.1.
 #--> add your Python code here
-precision
-recall
+precision = (len(hitDocs)/(len(hitDocs)+len(missedDocs)))*100
+recall = (len(hitDocs)/(len(hitDocs)+len(noise)))*100
+print("The precision: " + str(precision) + "%")
+print("The recall: " + str(recall) + "%")
